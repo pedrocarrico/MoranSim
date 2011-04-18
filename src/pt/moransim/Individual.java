@@ -1,6 +1,10 @@
 package pt.moransim;
 
+import org.apache.log4j.Logger;
+
 class Individual {
+    private static Logger logger = Logger.getLogger(Individual.class);
+
     private static final int NO_PARENT = -1;
 
     private int id;
@@ -20,11 +24,13 @@ class Individual {
     }
 
     public void die() {
-        System.out.println("I'm dying: " + this.id );
+        if (logger.isDebugEnabled())
+            logger.debug("I'm dying: " + this.id );
     }
 
     public Individual duplicate(int id) {
-        System.out.println("I'm duplicating: " + this.id );
+        if (logger.isDebugEnabled())
+            logger.debug("I'm duplicating: " + this.id );
         return new Individual(id, this.parentId);
     }
 }

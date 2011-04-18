@@ -1,10 +1,11 @@
 package pt.moransim;
 
-import java.util.Random;
+import org.apache.log4j.Logger;
 
 class Population {
-
-    private static final Random generator = new Random();
+    private static Logger logger = Logger.getLogger(Population.class);
+    
+    private static final RandomGenerator generator = new RandomGeneratorImpl();
     private int NOT_INITIALIZED = -1;
 
     private Individual[] individuals;
@@ -13,13 +14,20 @@ class Population {
     private int lastId;
 
     public Population(int numberOfIndividuals) {
-        
         individuals = new Individual[numberOfIndividuals + 1];
         
         for (lastId = 0 ; lastId < numberOfIndividuals ; lastId++) {
             individuals[lastId] = new Individual(lastId);
         }
         freeSlot = numberOfIndividuals;
+    }
+
+    public Individual[] getIndividuals() {
+        return individuals;
+    }
+
+    public int getFreeSlot() {
+        return freeSlot;
     }
 
     public void evolve() {
@@ -40,8 +48,9 @@ class Population {
         individuals[individualToDie].die();
         individuals[individualToDie] = null;
         freeSlot = individualToDie;
-
-        System.out.println(this.toString());
+        
+        if (logger.isDebugEnabled())
+            logger.debug(this.toString());
     }
 
     public String toString() {
