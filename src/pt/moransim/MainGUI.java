@@ -163,7 +163,4 @@ public class MainGUI extends javax.swing.JFrame {
       System.setOut(new PrintStream(out, true));
       System.setErr(new PrintStream(out, true));
     }
-
-
-
 }

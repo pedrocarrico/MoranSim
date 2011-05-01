@@ -63,4 +63,79 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="-init-macrodef-junit">
+        <macrodef name="junit" uri="http://www.netbeans.org/ns/j2se-project/3">
+            <attribute default="${includes}" name="includes"/>
+            <attribute default="${excludes}" name="excludes"/>
+            <attribute default="**" name="testincludes"/>
+            <sequential>
+                <junit dir="${work.dir}" errorproperty="tests.failed" failureproperty="tests.failed" fork="true" showoutput="true" tempdir="${build.dir}">
+                    <batchtest todir="${build.test.results.dir}">
+                        <fileset dir="${test.src.dir}" excludes="@{excludes},${excludes}" includes="@{includes}">
+                            <filename name="@{testincludes}"/>
+                        </fileset>
+                    </batchtest>
+                    <classpath location="${build.instrumented.dir}" />
+                    <classpath location="${build.classes.dir}" />
+                    <classpath>
+                        <path path="${run.test.classpath}"/>
+                    </classpath>
+                    <syspropertyset>
+                        <propertyref prefix="test-sys-prop."/>
+                        <mapper from="test-sys-prop.*" to="*" type="glob"/>
+                    </syspropertyset>
+                    <formatter type="brief" usefile="false"/>
+                    <formatter usefile="true" type="xml"/>
+                    <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
+                    <jvmarg line="${run.jvmargs}"/>
+                </junit>
+                <junitreport todir="${build.test.results.dir}">
+                <fileset dir="${build.test.results.dir}">
+                    <include name="TEST-*.xml"/>
+                </fileset>
+                <report format="noframes" todir="${build.test.results.dir}/html"/>
+            </junitreport> 
+            </sequential>
+        </macrodef>
+    </target>
+
+    <path id="cobertura.classpath">
+        <fileset dir="lib/">
+                <include name="cobertura.jar" />
+                <include name="asm-3.0.jar" />
+                <include name="asm-tree-3.0.jar" />
+                <include name="log4j-1.2.16.jar" />
+                <include name="jakarta-oro-2.0.8.jar" />
+        </fileset>
+    </path>
+
+    <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
+
+    <target depends="-init-check,init" name="-init-check-cobertura">
+        <fail unless="build.classes.dir">Must set build.classes.dir</fail>
+    </target>
+
+    <target name="-post-compile" depends="-init-check-cobertura,init">
+        <delete dir="${build.instrumented.dir}" />
+        <delete dir="${build.report.cobertura.dir}" />
+        <mkdir dir="${build.instrumented.dir}" />
+        <mkdir dir="${build.report.cobertura.dir}" />
+        <cobertura-instrument todir="${build.instrumented.dir}">
+            <fileset dir="${build.classes.dir}">
+                <include name="**/*.class"/>
+            </fileset>
+        </cobertura-instrument>
+    </target>
+
+    <target name="coberturareport" depends="init,test">
+      <!-- You can disable the html portion if you are using the hudson plugin and rely on
+        the xml -->
+        <cobertura-report format="html" srcdir="${src.dir}"
+                          destdir="${build.report.cobertura.dir}"/>
+        <!-- Used by the hudson plug-in - ->
+        <cobertura-report format="xml" srcdir="${src.dir}"
+                          destdir="${build.report.cobertura.dir}"/>
+        <!- - <delete file="cobertura.ser" /> -->
+    </target>
+
 </project>

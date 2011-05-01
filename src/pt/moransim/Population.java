@@ -48,7 +48,9 @@ class Population {
         individuals[individualToDie].die();
         individuals[individualToDie] = null;
         freeSlot = individualToDie;
+
         
+
         if (logger.isDebugEnabled())
             logger.debug(this.toString());
     }
